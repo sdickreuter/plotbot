@@ -18,7 +18,3 @@ provided the PITimer library is working.
 Main file, where the magic happens.
 ### Stepper.cpp & Stepper.h
 Class for wrapping the basic stepper motor driver control stuff
-### plotbot_commander.py
-Small gui written in python that offer basic control of the microcontroller and the steppers
-### plotbot_utils.py
-All the basic control stuff, has a class for controlling the bot in it
