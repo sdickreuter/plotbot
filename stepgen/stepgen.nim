@@ -61,15 +61,6 @@ proc calc_actions_from_intersections(xinter, yinter: var seq[Intersection]): (se
     t = newSeq[float]()
     a_buf = 0
     index = 1
-    x,y: float
-    stopx,stopy: float
-
-  if len(xinter) > 0:
-    x = xinter[0].value
-    stopx = xinter[^1].value
-  if len(yinter) > 0:
-    y = yinter[0].value
-    stopy = yinter[^1].value
 
   # calc differences in the values of the intersections, first element stays the same 
   for i in countdown(len(xinter)-1,1):
@@ -120,6 +111,7 @@ proc calc_actions_from_intersections(xinter, yinter: var seq[Intersection]): (se
           abuf += DIR_B
       
       if abuf > 0:
+        a &= abuf
         t.add(inter[index+1].t)
       # skip the two steps that where just merged
       index += 2
@@ -136,26 +128,11 @@ proc calc_actions_from_intersections(xinter, yinter: var seq[Intersection]): (se
           abuf += DIR_B
       
       if abuf > 0:
+        a &= abuf
         t.add(inter[index].t)
       # goto next step
       index += 1
   
-    if abuf > 0:
-      a &= abuf
-
-
-      if (abuf and int(STEP_A)) > 0:
-        if (abuf and int(DIR_A)) > 0:
-          x += 0.1
-        else:
-          x -= 0.1
-
-      if (abuf and int(STEP_B)) > 0:
-        if (abuf and int(DIR_B)) > 0:
-          y += 0.1
-        else:
-          y -= 0.1
-
   result = (a, t)
 
 

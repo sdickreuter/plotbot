@@ -42,23 +42,6 @@ proc max*(c: Curve): Vec2[float] =
         result[1] = c.b[1]
 
     of ckBezier:
-      # if (c.b0[0] >= c.b1[0]) and (c.b0[0] >= c.b2[0]) and (c.b0[0] >= c.b3[0]):
-      #   result[0] = c.b0[0]
-      # elif (c.b1[0] >= c.b0[0]) and (c.b1[0] >= c.b2[0]) and (c.b1[0] >= c.b3[0]):
-      #   result[0] = c.b1[0]
-      # elif (c.b2[0] >= c.b0[0]) and (c.b2[0] >= c.b1[0]) and (c.b2[0] >= c.b3[0]):
-      #   result[0] = c.b2[0]
-      # elif (c.b3[0] >= c.b0[0]) and (c.b3[0] >= c.b1[0]) and (c.b3[0] >= c.b2[0]):
-      #   result[0] = c.b3[0]
-
-      # if (c.b0[1] >= c.b1[1]) and (c.b0[1] >= c.b2[1]) and (c.b0[1] >= c.b3[1]):
-      #   result[1] = c.b0[1]
-      # elif (c.b1[1] >= c.b0[1]) and (c.b1[1] >= c.b2[1]) and (c.b1[1] >= c.b3[1]):
-      #   result[1] = c.b1[1]
-      # elif (c.b2[1] >= c.b0[1]) and (c.b2[1] >= c.b1[1]) and (c.b2[1] >= c.b3[1]):
-      #   result[1] = c.b2[1]
-      # elif (c.b3[1] >= c.b0[1]) and (c.b3[1] >= c.b1[1]) and (c.b3[1] >= c.b2[1]):
-      #   result[1] = c.b3[1]
       if c.b0[0] >= c.b3[0]:
         result[0] = c.b0[0]
       else:
@@ -86,23 +69,6 @@ proc min*(c: Curve): Vec2[float] =
         result[1] = c.b[1]
 
     of ckBezier:
-      # if (c.b0[0] <= c.b1[0]) and (c.b0[0] <= c.b2[0]) and (c.b0[0] <= c.b3[0]):
-      #   result[0] = c.b0[0]
-      # elif (c.b1[0] <= c.b0[0]) and (c.b1[0] <= c.b2[0]) and (c.b1[0] <= c.b3[0]):
-      #   result[0] = c.b1[0]
-      # elif (c.b2[0] <= c.b0[0]) and (c.b2[0] <= c.b1[0]) and (c.b2[0] <= c.b3[0]):
-      #   result[0] = c.b2[0]
-      # elif (c.b3[0] <= c.b0[0]) and (c.b3[0] <= c.b1[0]) and (c.b3[0] <= c.b2[0]):
-      #   result[0] = c.b3[0]
-
-      # if (c.b0[1] <= c.b1[1]) and (c.b0[1] <= c.b2[1]) and (c.b0[1] <= c.b3[1]):
-      #   result[1] = c.b0[1]
-      # elif (c.b1[1] <= c.b0[1]) and (c.b1[1] <= c.b2[1]) and (c.b1[1] <= c.b3[1]):
-      #   result[1] = c.b1[1]
-      # elif (c.b2[1] <= c.b0[1]) and (c.b2[1] <= c.b1[1]) and (c.b2[1] <= c.b3[1]):
-      #   result[1] = c.b2[1]
-      # elif (c.b3[1] <= c.b0[1]) and (c.b3[1] <= c.b1[1]) and (c.b3[1] <= c.b2[1]):
-      #   result[1] = c.b3[1]
       if c.b0[0] <= c.b3[0]:
         result[0] = c.b0[0]
       else:

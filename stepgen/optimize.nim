@@ -139,10 +139,10 @@ proc generate_steps*(paths: seq[Path], distperstep: float = 0.00375): (seq[int],
   a &= abuf
   dt &= dtbuf 
 
-  # echo("--- connecting last path to starting point ---")
-  # (dtbuf, abuf) = gen_part(connect_path_to_point(paths[^1], vec2(3.0, 3.0)), distperstep, 200, draw = false)
-  # a = a & abuf
-  # dt = dt & dtbuf 
+  echo("--- connecting last path to starting point ---")
+  (dtbuf, abuf) = gen_part(connect_path_to_point(paths[^1], vec2(3.0, 3.0)), distperstep, 200, draw = false)
+  a = a & abuf
+  dt = dt & dtbuf 
 
   echo("--- finished generation of timings ---")
 
