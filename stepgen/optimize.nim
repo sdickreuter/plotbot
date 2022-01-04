@@ -184,8 +184,8 @@ if isMainModule:
   # shift paths to drawable area
   for i in 0..(len(paths)-1):
     echo("len curves path[",i,"]: ",len(paths[i].c))
-    #paths[i].shift(vec2(+82.0, 4.0))
-    paths[i].shift(vec2(+80.0, 4.0))
+    paths[i].shift(vec2(+83.0, 8.0))
+    #paths[i].shift(vec2(+80.0, 4.0))
 
   for i in 0..<len(paths):
    paths[i].remove_short_curves(1e-2)

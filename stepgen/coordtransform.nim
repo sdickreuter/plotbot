@@ -6,8 +6,8 @@ import curve
 
 let
   #al = 81.5#arm length [cm]
-  al_a = 81.57#8.5 # a arm length [cm]
-  al_b = 81.5#85.5 #  arm length [cm]
+  al_a = 81.5#8.5 # a arm length [cm]
+  al_b = 81.57#85.5 #  arm length [cm]
   fa = 80.0 # y position of rail a [cm] 
   fb = -3.0 # y position of rail b [cm] 
   zero = vec2(70.14271166700073, 41.5) # x/y pos when position on rail a/b is 0.0/0.0
@@ -173,23 +173,44 @@ proc xy_to_ab*(c: Vec2[float]): Vec2[float] =
     b = intersect_line_circle(vec2(0.0,fb), vec2(175.0,fb), c, al_b)
   else:
     var
-      l2, alpha: float
-      v1: Vec2[float]
+      l1, alpha: float
+      v1 : Vec2[float]
 
-    l2 = sqrt((al_a - para_offset)^2 + ortho_offset^2)
+    l1 = sqrt((al_b - para_offset)^2 + ortho_offset^2)
 
-    a = intersect_line_circle(vec2(0.0,fa), vec2(175.0,fa), c, l2)
-    alpha = arcsin(ortho_offset/l2)
+
+    # vector pointing to point on rail b
+    b = vec2(fb,0)
+    b[0] = sqrt(l1^2 - c[1]^2)
+    b[0] = c[0] + b[0]
     
-    v1 = (c - a)
-    
+
+    # vector pointing from rail b to c
+    v1 = c - b
+    v1 = normalize(v1)
+
+
+    # rotate v1 clockwise aroung angle alpha
+    alpha = arcsin(ortho_offset/l1)
     v1[0] =  cos(alpha)*v1[0] + sin(alpha)*v1[1]
     v1[1] = -sin(alpha)*v1[0] + cos(alpha)*v1[1]
      
-    v1 = normalize(v1) * al_a + a
 
-    #echo("l2 ",l2," | c ",c," | v1 ",v1)
-    b = intersect_line_circle(vec2(0.0,fb), vec2(175.0,fb), v1, al_b) 
+    # adjust length
+    v1 = v1* al_b
+
+    # calculate position of joint
+    v1 = v1 + b
+
+    # calculate position on rail a
+    a = vec2(fa,0)
+    a[0] = sqrt(al_a^2 + c[1]^2) 
+    a[0] = v1[0] + a[0]
+
+
+    a[0] = 200 - a[0]
+    b[0] = 200 - b[0]
+
 
   result = vec2(a[0],b[0])
 

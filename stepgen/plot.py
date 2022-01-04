@@ -9,7 +9,7 @@ STEP_B  = 0b00001000
 PENUP   = 0b00010000
 PENDOWN = 0b00100000
 END     = 0b01000000
-
+  
 
 # def tri_peak(t, a, t0, width):
 #   result = np.zeros(len(t))
