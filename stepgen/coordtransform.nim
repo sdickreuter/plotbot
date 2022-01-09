@@ -11,8 +11,8 @@ let
   fa = 80.0 # y position of rail a [cm] 
   fb = -3.0 # y position of rail b [cm] 
   zero = vec2(70.14271166700073, 41.5) # x/y pos when position on rail a/b is 0.0/0.0
-  para_offset = 3.0 # [cm] offset along/parallel arm a
-  ortho_offset = 4.5 # [cm] offset away from/orthogonal arm a
+  para_offset = 4.5 # [cm] offset along/parallel arm a
+  ortho_offset = 3.0 # [cm] offset away from/orthogonal arm a
 
 # proc ab_to_xy*(p: Vec2[float]): Vec2[float] =
 #   var 
@@ -168,48 +168,41 @@ proc xy_to_ab*(c: Vec2[float]): Vec2[float] =
   if (c[1] > fa) or (c[1]) < 0:
     echo("WARNING: Points outside of reachable drawing area!")
 
-  if (para_offset == 0) and (ortho_offset == 0): 
-    a = intersect_line_circle(vec2(0.0,fa), vec2(175.0,fa), c, al_a)
-    b = intersect_line_circle(vec2(0.0,fb), vec2(175.0,fb), c, al_b)
-  else:
-    var
-      l1, alpha: float
-      v1 : Vec2[float]
+  var
+    l1, alpha: float
+    v1 : Vec2[float]
 
-    l1 = sqrt((al_b - para_offset)^2 + ortho_offset^2)
+  l1 = sqrt((al_b - para_offset)^2 + ortho_offset^2)
 
+  # vector pointing to point on rail b
+  b = vec2(0.0,fb)
+  b[0] = sqrt(l1^2 - (c[1]-b[1])^2)
+  b[0] = c[0] + b[0]
 
-    # vector pointing to point on rail b
-    b = vec2(fb,0)
-    b[0] = sqrt(l1^2 - c[1]^2)
-    b[0] = c[0] + b[0]
-    
-
-    # vector pointing from rail b to c
-    v1 = c - b
-    v1 = normalize(v1)
+  # vector pointing from rail b to c
+  v1 = c - b
+  v1 = normalize(v1)
 
 
-    # rotate v1 clockwise aroung angle alpha
-    alpha = arcsin(ortho_offset/l1)
-    v1[0] =  cos(alpha)*v1[0] + sin(alpha)*v1[1]
-    v1[1] = -sin(alpha)*v1[0] + cos(alpha)*v1[1]
-     
+  # rotate v1 clockwise aroung angle alpha
+  alpha = arcsin(ortho_offset/l1)
+  v1[0] =  cos(alpha)*v1[0] + sin(alpha)*v1[1]
+  v1[1] = -sin(alpha)*v1[0] + cos(alpha)*v1[1]
+   
 
-    # adjust length
-    v1 = v1* al_b
+  # adjust length
+  v1 = v1* al_b
 
-    # calculate position of joint
-    v1 = v1 + b
+  # calculate position of joint
+  v1 = v1 + b
 
-    # calculate position on rail a
-    a = vec2(fa,0)
-    a[0] = sqrt(al_a^2 + c[1]^2) 
-    a[0] = v1[0] + a[0]
+  # calculate position on rail a
+  a = vec2(0.0,fa)
+  a[0] = sqrt(al_a^2 - (a[1]-v1[1])^2) 
+  a[0] = v1[0] + a[0]
 
-
-    a[0] = 200 - a[0]
-    b[0] = 200 - b[0]
+  a[0] = 180 - a[0]
+  b[0] = 180 - b[0]
 
 
   result = vec2(a[0],b[0])
@@ -258,15 +251,20 @@ if isMainModule:
     a1,b1,a2,b2,v1,v2,v3,v4 : Vec2[float] 
 
 
-  echo("zero ",ab_to_xy(vec2(0.0,0.0)))
-  v1 = vec2(82.0,10.0)
-  echo(v1)
-  a1 = xy_to_ab(v1)
-  echo(a1)
-  echo(a1/0.00375)
-
-
-  echo("start ",ab_to_xy(vec2(40.5,2.5))) 
+  v1 = vec2(1.0,1.0)
+  echo(v1, xy_to_ab(v1))
+  v1 = vec2(1.0,2.0)
+  echo(v1, xy_to_ab(v1))
+  echo("")
+  v1 = vec2(1.0,40.0)
+  echo(v1, xy_to_ab(v1))
+  v1 = vec2(1.0,41.0)
+  echo(v1, xy_to_ab(v1))
+  echo("")
+  v1 = vec2(1.0,75.0)
+  echo(v1, xy_to_ab(v1))
+  v1 = vec2(1.0,76.0)
+  echo(v1, xy_to_ab(v1))
 
   # echo("zero ",ab_to_xy(vec2(0.0,0.0)))
 

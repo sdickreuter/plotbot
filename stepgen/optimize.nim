@@ -139,10 +139,10 @@ proc generate_steps*(paths: seq[Path], distperstep: float = 0.00375): (seq[int],
   a &= abuf
   dt &= dtbuf 
 
-  echo("--- connecting last path to starting point ---")
-  (dtbuf, abuf) = gen_part(connect_path_to_point(paths[^1], vec2(3.0, 3.0)), distperstep, 200, draw = false)
-  a = a & abuf
-  dt = dt & dtbuf 
+  # echo("--- connecting last path to starting point ---")
+  # (dtbuf, abuf) = gen_part(connect_path_to_point(paths[^1], vec2(3.0, 3.0)), distperstep, 200, draw = false)
+  # a = a & abuf
+  # dt = dt & dtbuf 
 
   echo("--- finished generation of timings ---")
 
@@ -184,17 +184,24 @@ if isMainModule:
   # shift paths to drawable area
   for i in 0..(len(paths)-1):
     echo("len curves path[",i,"]: ",len(paths[i].c))
-    paths[i].shift(vec2(+83.0, 8.0))
-    #paths[i].shift(vec2(+80.0, 4.0))
+    paths[i].shift(vec2(+8.0, 3.0))
+    #paths[i].shift(vec2(+0.0, -20.0))
+
+
 
   for i in 0..<len(paths):
    paths[i].remove_short_curves(1e-2)
+
+
+  echo("min ", paths.min())
+  echo("max ", paths.max())
 
 
   echo("do coordinate transformation")
   # apply coordiante transformation
   for i in 0..(len(paths)-1):
     paths[i].xy_to_ab()
+
 
 
   #echo("paths start/end:")
