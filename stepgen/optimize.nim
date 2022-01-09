@@ -172,34 +172,57 @@ if isMainModule:
     paths: seq[Path]
 
 
-  paths = parsesvg("./test.svg")
+  paths = parsesvg("./test2.svg")
   #paths = parsesvg("./test11.svg")
 
   echo(len(paths[0].c))
 
   var
     v = paths.min()
-
+    n = 0
 
   # shift paths to drawable area
   for i in 0..(len(paths)-1):
-    echo("len curves path[",i,"]: ",len(paths[i].c))
     paths[i].shift(vec2(+8.0, 3.0))
     #paths[i].shift(vec2(+0.0, -20.0))
 
 
 
+  echo("remove short curves")
   for i in 0..<len(paths):
-   paths[i].remove_short_curves(1e-2)
+    paths[i].remove_short_curves(1e-2)
 
 
-  echo("min ", paths.min())
-  echo("max ", paths.max())
+
+  echo("remove empty paths")
+  var
+      indices = newSeq[int]()
+
+  for i in 0..<len(paths):
+    if len(paths[i].c) < 1:
+      indices.add(i)
+  
+  for i in indices:
+    echo("deleting path ",i)
+    paths.del(i)
+
+
+
+  n=0
+  for i in 0..<len(paths):
+    if len(paths[i].c) < 1:
+      n += 1
+    #echo("len curves path[",i,"]: ",len(paths[i].c))
+  echo("number of paths with zero curves: ",n)
+
+
+  #echo("min ", paths.min())
+  #echo("max ", paths.max())
 
 
   echo("do coordinate transformation")
   # apply coordiante transformation
-  for i in 0..(len(paths)-1):
+  for i in 0..<len(paths):
     paths[i].xy_to_ab()
 
 
@@ -232,6 +255,12 @@ if isMainModule:
   (a_buf, dt_buf) = generate_steps(paths,distperstep)
   a &= a_buf
   dt &= dt_buf
+
+  echo("--- connecting end point to path ---")
+  (dtbuf, abuf) = gen_part(connect_point_to_point(paths[^1].endpoint,vec2(0.0, 0.0)), distperstep, 500, draw = false)
+  a = a & abuf
+  dt = dt & dtbuf 
+
 
   # if (len(paths)-1) < count:
   #   max_ind = len(paths)-1

@@ -271,6 +271,19 @@ class Form(QtWidgets.QDialog):
 
 
     def runfile(self):
+
+        t = np.loadtxt("Zeichnung.tmng",delimiter=" ",skiprows=1)
+        t = t.astype(int)
+
+        self.textbox.appendPlainText("runtime: " + str(np.round(np.sum(t[:,0])/(60*1e6))) + " minutes")
+
+
+        reply = QtWidgets.QMessageBox.question(self, "Start Drawing?", "Runtime: " + str(np.round(np.sum(t[:,0])/(60*1e6))) + " minutes, proceed?",
+                                     QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+ 
+        if reply == QtWidgets.QMessageBox.No:
+            return
+
         self.bot.clear()
         
         self.bot.home()
@@ -279,9 +292,6 @@ class Form(QtWidgets.QDialog):
         self.bot.zero()
         
         self.bot.start_moving()
-
-        t = np.loadtxt("Zeichnung.tmng",delimiter=" ",skiprows=1)
-        t = t.astype(int)
 
         size = 300
 

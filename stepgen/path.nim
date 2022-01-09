@@ -55,7 +55,7 @@ proc remove_short_curves*(p: var Path, min_length: float = 0.01) =
         buf: Vec2[float]
 
     for i in 0..<len(p.c):
-        echo("remove_short_curves: ",p.c[i].get_arclength())
+        #echo("remove_short_curves: ",p.c[i].get_arclength())
         if p.c[i].get_arclength() < min_length:
             indices.add(i)
 
