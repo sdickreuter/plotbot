@@ -3,16 +3,8 @@ import curve
 import streams, parsexml, strutils
 import path
 import parsepath
+import nimsvg
 
-# proc parseVec2(s: string): Vec2[float] =
-#   var
-#     buf: seq[string]
-
-#   echo("parseVec2 ", s)
-#   result = vec2(0.0, 0.0)
-#   buf = s.split(",")
-#   result[0] = parseFloat(buf[0])
-#   result[1] = parseFloat(buf[1])
 
 
 proc parseviewbox(s: string): seq[float] =
@@ -32,6 +24,7 @@ proc parselength(s: string): float =
     buf: seq[string]
 
   buf = s.split("cm")
+
   #buf = s.split("pt")
   result = parseFloat(buf[0])
 
@@ -135,52 +128,41 @@ if isMainModule:
     v: Vec2[float]
     l = 0.0
 
-  paths = parsesvg("./test15.svg")
+  #paths = parsesvg("./test15.svg")
+  paths = parsesvg("./schraffiert2.svg")
 
 
   # shift paths to drawable area
-  for i in 0..(len(paths)-1):
-    #paths[i].shift(vec2(+82.0, 4.0))
-    paths[i].shift(vec2(+80.0, 4.0))
+  #for i in 0..(len(paths)-1):
+  #  #paths[i].shift(vec2(+82.0, 4.0))
+  #  paths[i].shift(vec2(+80.0, 4.0))
 
-  # for i in 0..<len(paths):
-  #   paths[i].xy_to_ab()
+  #for i in 0..<len(paths):
+  #  paths[i].xy_to_ab()
 
   #for i in 0..<len(paths):
   #  echo(paths[i])
 
-
-  for p in paths:
-    while true:
-      v = p.calc_point(l)
-      x.add(v[0])
-      y.add(v[1])
-      l += 0.1
-      if l > p.get_arclength():
-        l = 0.0
-        break
-
-  let f = open("parsedsvg" & ".csv", fmWrite)
-  for i in 0..<len(x):
-    f.writeLine( $(x[i]) & ", " & $(y[i]))
-  f.close()
-
-  x = newSeq[float]()
-  y = newSeq[float]()
-
-  for p in paths:
-    for c in p.c:
-      x.add(c.b0[0])
-      y.add(c.b0[1])
-      x.add(c.b1[0])
-      y.add(c.b1[1])
-      x.add(c.b2[0])
-      y.add(c.b2[1])
-      x.add(c.b3[0])
-      y.add(c.b3[1])
+  buildSvgFile("svgtest.svg"):
+    svg(width = 200, height = 200):
+      for p in paths:
+        for c in p.c:
+          if c.kind == ckBezier:
+            line(x1 = c.b0[0], y1 = c.b0[1], x2 = c.b3[0], y2 = c.b3[1])
 
 
-  let f2 = open("svgpoints" & ".csv", fmWrite)
-  for i in 0..<len(x):
-    f2.writeLine( $(x[i]) & ", " & $(y[i]))
-  f2.close()
+
+  #for p in paths:
+  #  while true:
+  #    v = p.calc_point(l)
+  #    x.add(v[0])
+  #    y.add(v[1])
+  #    l += 0.1
+  #    if l > p.get_arclength():
+  #      l = 0.0
+  #      break
+
+  #let f = open("parsedsvg" & ".csv", fmWrite)
+  #for i in 0..<len(x):
+  #  f.writeLine( $(x[i]) & ", " & $(y[i]))
+  #f.close()

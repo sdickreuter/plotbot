@@ -104,6 +104,22 @@ proc scale*(c: var Curve, v: Vec2[float]) =
       c.b3 *= v
 
 
+proc startpoint*(c: Curve): Vec2[float] =
+  case c.kind
+    of ckLine:
+      result = c.a
+    of ckBezier:
+      result = c.b0
+
+
+proc endpoint*(c: Curve): Vec2[float] =
+  case c.kind
+    of ckLine:
+      result = c.b
+    of ckBezier:
+      result = c.b3
+
+
 proc newLine*(): Curve =
   result = Curve(kind: ckLine)
   result.a = vec2(0.0, 0.0)
@@ -177,15 +193,16 @@ proc calc_derivderiv*(c: Curve, t: float): Vec2[float] =
     of ckBezier:
       # calculate derivative of the derivative from cubic bezier at speed parametrization t
       result = vec2(0.0, 0.0)
-      result = 6.0 * (c.b0*(-t) + c.b0 + c.b1*(-2.0+3.0*t) - 3.0 * c.b2 * t +c.b2 + c.b3*t)
+      result = 6.0 * (c.b0*(-t) + c.b0 + c.b1*(-2.0+3.0*t) - 3.0 * c.b2 *
+          t +c.b2 + c.b3*t)
 
 
 proc calc_curvature*(c: Curve, t: float): float =
   var
-    d = calc_derivative(c,t)
-    dd = calc_derivderiv(c,t)
+    d = calc_derivative(c, t)
+    dd = calc_derivderiv(c, t)
 
-  result =  abs(d[0]*dd[1]-d[1]*dd[0])/pow(d[0]*d[0]+d[1]*d[1],3/2)
+  result = abs(d[0]*dd[1]-d[1]*dd[0])/pow(d[0]*d[0]+d[1]*d[1], 3/2)
 
 
 proc calc_arclength*(c: Curve, t = 1.0): float =

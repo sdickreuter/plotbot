@@ -56,6 +56,10 @@ filename = "Zeichnung.tmng"
 
 dat = np.loadtxt(filename,delimiter=" ",skiprows=1)
 
+t = dat.astype(int)
+print("runtime: " + str(np.round(np.sum(t[:,0])/(60*1e6))) + " minutes")
+
+
 dt = dat[:,0]
 ac = np.array(dat[:,1], dtype = int)
 
@@ -66,19 +70,21 @@ for i in range(len(dt)):
 t = np.array(t[1:], dtype=float)
 
 
+
+
 # plt.plot(t[np.bitwise_and(ac,STEP_A)],dt[np.bitwise_and(ac,STEP_A)])
 # plt.plot(t[np.bitwise_and(ac,STEP_B)],dt[np.bitwise_and(ac,STEP_B)])
 # plt.show()
 
-plt.plot(t,dt)
-plt.show()
+#plt.plot(t,dt)
+#plt.show()
 
 dta = dt[np.bitwise_and(ac,STEP_A)]
 dtb = dt[np.bitwise_and(ac,STEP_B)]
 ta = t[np.bitwise_and(ac,STEP_A)]
 tb = t[np.bitwise_and(ac,STEP_B)]
 
-distperstep = 1.0#0.00375
+distperstep = 0.00375
 
 xpos = 0
 ypos = 0
@@ -109,10 +115,16 @@ idtb = 0
 #     x.append(xpos)
 #     y.append(ypos)
 
+
+xs = []
+ys = []
+upind = 0
+downind = 0
+draw = False
 for i in range(len(ac)):
-  ax = 0.0
-  ay = 0.0
-  
+  ax = None
+  ay = None
+
   if (ac[i] & STEP_A) > 0:
     if (ac[i] & DIR_A) > 0:
       ax = distperstep
@@ -125,31 +137,77 @@ for i in range(len(ac)):
     else:
       ay = -distperstep
   
-  if (ax != 0.0) or (ay != 0.0):
-    x.append(x[-1] + ax)
-    y.append(y[-1] + ay)
+  if ax is not None or ay is not None:
+    if ax is not None:
+      x.append(x[-1] + ax)
+    else:
+      x.append(x[-1])
+    if ay is not None:
+      y.append(y[-1] + ay)
+    else:
+      y.append(y[-1])
 
 
-phi = np.repeat(np.linspace(0, 1.5*np.pi, 100),int(np.ceil(len(x)/100)))
-phi = phi[:len(x)]
-rgb_cycle = np.vstack((            # Three sinusoids
-    .5*(1.+np.cos(phi          )), # scaled to [0,1]
-    .5*(1.+np.cos(phi+2*np.pi/3)), # 120° phase shifted.
-    .5*(1.+np.cos(phi-2*np.pi/3)))).T # Shape = (60,3)
+  if (ac[i] & PENUP) > 0:
+    upind = i
+    xs.append(x[downind:])
+    ys.append(y[downind:])
+  elif (ac[i] & PENDOWN) > 0:
+    downind = i
 
-print(rgb_cycle.shape)
 
-x = np.array(x)
-y = np.array(y)
+print(len(xs))
+for i in range(len(xs)):
+  #print(min(xs[i]),max(xs[i]),min(ys[i]),max(ys[i]))
+  print(len(xs[i]), len(ys[i]))
 
-markers = ['D','s']*int(np.ceil(len(x)/2))
+for i in range(len(xs)):
+  plt.plot(xs[i],ys[i])
+plt.show()
 
-fig, ax = plt.subplots()
-ax.scatter([x[0]],[[y[0]]],color="black", marker="x", s=500, alpha=1.0)
-ax.scatter([x[-1]],[[y[-1]]],color="red", marker="x", s=500, alpha=1.0)
 
-# for xp, yp, m, rgb in zip(x, y, markers, rgb_cycle):
-#     ax.scatter([xp],[yp],color=rgb, marker=m, s=500, alpha=0.5)
+
+# for i in range(len(ac)):
+#   ax = 0.0
+#   ay = 0.0
+  
+#   if (ac[i] & STEP_A) > 0:
+#     if (ac[i] & DIR_A) > 0:
+#       ax = distperstep
+#     else:
+#       ax = -distperstep
+
+#   if (ac[i] & STEP_B) > 0:
+#     if (ac[i] & DIR_B) > 0:
+#       ay = distperstep
+#     else:
+#       ay = -distperstep
+  
+#   if (ax != 0.0) or (ay != 0.0):
+#     x.append(x[-1] + ax)
+#     y.append(y[-1] + ay)
+
+
+# phi = np.repeat(np.linspace(0, 1.5*np.pi, 100),int(np.ceil(len(x)/100)))
+# phi = phi[:len(x)]
+# rgb_cycle = np.vstack((            # Three sinusoids
+#     .5*(1.+np.cos(phi          )), # scaled to [0,1]
+#     .5*(1.+np.cos(phi+2*np.pi/3)), # 120° phase shifted.
+#     .5*(1.+np.cos(phi-2*np.pi/3)))).T # Shape = (60,3)
+
+# print(rgb_cycle.shape)
+
+# x = np.array(x)
+# y = np.array(y)
+
+# markers = ['D','s']*int(np.ceil(len(x)/2))
+
+# fig, ax = plt.subplots()
+# ax.scatter([x[0]],[[y[0]]],color="black", marker="x", s=500, alpha=1.0)
+# ax.scatter([x[-1]],[[y[-1]]],color="red", marker="x", s=500, alpha=1.0)
+
+# # for xp, yp, m, rgb in zip(x, y, markers, rgb_cycle):
+# #     ax.scatter([xp],[yp],color=rgb, marker=m, s=500, alpha=0.5)
 
 
 plt.plot(x,y)

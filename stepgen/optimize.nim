@@ -15,7 +15,7 @@ import numutils
 proc add_slow_down(dt: var seq[float], i0, width: int, a: float) =
   for i in 0..<len(dt):
     #dt[i] += quad_peak((float) i, a, (float) i0, (float) width)
-    dt[i] += cos_peak((float) i, a, (float) i0, (float) width)
+    dt[i] += cos_peak((float)i, a, (float)i0, (float)width)
     #dt[i] += tri_peak((float)i, a, (float)i0, (float)width)
 
 
@@ -35,13 +35,14 @@ proc slow_down_by_curvature(path: Path, dt: var seq[float], t: seq[float]) =
     #echo(curvature[i], "  ",limit_and_normalize(curvature[i],1,1000))
     #dtbuf[i] += limit_and_normalize(curvature[i],0.1,10000)*800
     if dt[i] < 1500:
-      add_slow_down(dt, i, 1000, 100*limit_and_normalize(curvature[i],1,20000)) 
+      add_slow_down(dt, i, 1000, 100*limit_and_normalize(curvature[i], 1, 20000))
     #     if alphas[i-1] > 1e-1: echo(round(alphas[i-1],5))
     #     alphas[i-1] = limit_and_normalize(alphas[i-1], minval, maxval)
     #     add_slow_down(dtbuf, i, 500, 800*alphas[i-1])
 
 
-proc gen_part(path: Path, distperstep: float, mindt: float, draw: bool = false): (seq[float], seq[int]) =
+proc gen_part(path: Path, distperstep: float, mindt: float,
+    draw: bool = false): (seq[float], seq[int]) =
   var
     t: seq[float]
     dt, dtbuf: seq[float]
@@ -51,24 +52,21 @@ proc gen_part(path: Path, distperstep: float, mindt: float, draw: bool = false):
     fac: float
 
   (abuf, t) = calc_actions(path, distperstep)
-  dtbuf = repeat(mindt,len(abuf))
+  dtbuf = repeat(mindt, len(abuf))
 
   #echo("gen_part start",path.c[0].b0,"   len ",len(t))
 
   if len(abuf) > 0:
 
     # add slowdown on corners between curves based on angle of the corner
-    for i in 1..<len(t):    
+    for i in 1..<len(t):
       if floor(t[i]) - floor(t[i-1]) == 1.0:
-        #echo(t[i], " ", floor(t[i]), " ", t[i-1]," ", floor(t[i-1]))
-        p1 = normalize(path.calc_point_t(t[i])-path.calc_point_t(t[i]-distperstep))
+        p1 = normalize(path.calc_point_t(t[i])-path.calc_point_t(t[
+            i]-distperstep))
         p2 = normalize(path.calc_point_t(t[i]+distperstep)-path.calc_point_t(t[i]))
-        #p1 = normalize(path.calc_point_t(t[i-1])-path.calc_point_t(floor(t[i])))
-        #p2 = normalize(path.calc_point_t(floor(t[i]))-path.calc_point_t(t[i-1]))
-        #echo(p1," ",p2," ",arccos(abs(dot(p1,p2)))," | ",dot(p1,p2))
-        fac = limit_and_normalize(arccos(abs(dot(p1,p2))),0.0,1.0)
-        #fac = arccos(abs(dot(p1,p2)))
-        #echo(fac)
+
+        fac = limit_and_normalize(arccos(abs(dot(p1, p2))), 0.0, 1.0)
+
         if (fac.classify != fcNaN) and (fac.classify != fcInf):
           add_slow_down(dtbuf, i, 1000, 1500*fac)
 
@@ -84,7 +82,7 @@ proc gen_part(path: Path, distperstep: float, mindt: float, draw: bool = false):
       dt.add(400000)
 
     a = a & abuf
-    dt = dt & dtbuf 
+    dt = dt & dtbuf
 
     if draw:
       a.add( (int)PENUP)
@@ -106,10 +104,10 @@ proc generate_steps*(paths: seq[Path], distperstep: float = 0.00375): (seq[int],
 
 
   for i in 0..(len(paths)-2):
-    echo("--- processing ", i+1, "/", len(paths)," ---")
+    echo("--- processing ", i+1, "/", len(paths), " ---")
     (dtbuf, abuf) = gen_part(paths[i], distperstep, 700, draw = true)
-    a &=  abuf
-    dt &= dtbuf 
+    a &= abuf
+    dt &= dtbuf
 
     #echo("--- connecting to next path ---")
     #pbuf = connect_path_to_path(paths[i], paths[i+1])
@@ -121,8 +119,9 @@ proc generate_steps*(paths: seq[Path], distperstep: float = 0.00375): (seq[int],
     stop = paths[i+1].startpoint()
     #stop = round(stop/distperstep)*distperstep
     #echo("connection: start ",start,"  stop ",stop)
-    pbuf = connect_point_to_point(start,stop)
-    
+    #pbuf = connect_point_to_point(start, stop)
+    pbuf = connect_path_to_path(paths[i], paths[i+1])
+
     #echo("  start ",paths[i].c[^1].b3)
     #echo("  end ",paths[i+1].c[0].b0)
     #echo("  con ",pbuf.c[0].b0," ",pbuf.c[0].b3," ")
@@ -137,12 +136,12 @@ proc generate_steps*(paths: seq[Path], distperstep: float = 0.00375): (seq[int],
   #echo("--- processing ", len(paths), "/", len(paths)," ---")
   (dtbuf, abuf) = gen_part(paths[^1], distperstep, 700, draw = true)
   a &= abuf
-  dt &= dtbuf 
+  dt &= dtbuf
 
   # echo("--- connecting last path to starting point ---")
   # (dtbuf, abuf) = gen_part(connect_path_to_point(paths[^1], vec2(3.0, 3.0)), distperstep, 200, draw = false)
   # a = a & abuf
-  # dt = dt & dtbuf 
+  # dt = dt & dtbuf
 
   echo("--- finished generation of timings ---")
 
@@ -157,7 +156,7 @@ proc write_steps_to_file*(filename: string, dt: seq[float], a: seq[int]) =
   echo("saving timings to file")
 
   for i in 0..<len(dt):
-    f.writeLine( $((int) round(dt[i])) & " " & $(a[i]))
+    f.writeLine( $((int)round(dt[i])) & " " & $(a[i]))
     # if (a[i] and PENUP) or (a[i] and PENDOWN):
     #   f.writeLine( $( 40000.0) & " " & $(a[i]))
     # else:
@@ -166,14 +165,19 @@ proc write_steps_to_file*(filename: string, dt: seq[float], a: seq[int]) =
   echo("finished saving")
 
 
+
+
+
+
 if isMainModule:
 
   var
     paths: seq[Path]
 
 
-  paths = parsesvg("./test2.svg")
+  #paths = parsesvg("./test2.svg")
   #paths = parsesvg("./test11.svg")
+  paths = parsesvg("./schraffiert2.svg")
 
   echo(len(paths[0].c))
 
@@ -190,30 +194,32 @@ if isMainModule:
 
   echo("remove short curves")
   for i in 0..<len(paths):
-    paths[i].remove_short_curves(1e-2)
+    paths[i].remove_short_curves(1e-6)
 
 
 
   echo("remove empty paths")
   var
-      indices = newSeq[int]()
+    indices = newSeq[int]()
 
   for i in 0..<len(paths):
     if len(paths[i].c) < 1:
       indices.add(i)
-  
+
+
+  indices = indices.reversed()
   for i in indices:
-    echo("deleting path ",i)
+    echo("deleting path ", i)
     paths.del(i)
 
 
 
-  n=0
+  n = 0
   for i in 0..<len(paths):
     if len(paths[i].c) < 1:
       n += 1
     #echo("len curves path[",i,"]: ",len(paths[i].c))
-  echo("number of paths with zero curves: ",n)
+  echo("number of paths with zero curves: ", n)
 
 
   #echo("min ", paths.min())
@@ -222,8 +228,8 @@ if isMainModule:
 
   echo("do coordinate transformation")
   # apply coordiante transformation
-  for i in 0..<len(paths):
-    paths[i].xy_to_ab()
+  #for i in 0..<len(paths):
+  #  paths[i].xy_to_ab()
 
 
 
@@ -243,23 +249,27 @@ if isMainModule:
     max_ind = 0
     count = 5
     done = false
-    distperstep: float = 0.00375
-    #distperstep: float = 0.1
+    distperstep: float = 0.00375 # cm
+
+    #distperstep: float = 0.0375 # mm
+
 
   echo("--- connecting starting point to path ---")
-  (dtbuf, abuf) = gen_part(connect_point_to_point(vec2(0.0, 0.0), paths[0].startpoint), distperstep, 500, draw = false)
+  (dtbuf, abuf) = gen_part(connect_point_to_point(vec2(0.0, 0.0), paths[
+      0].startpoint), distperstep, 500, draw = false)
   a = a & abuf
-  dt = dt & dtbuf 
+  dt = dt & dtbuf
 
   echo("generate timings")
-  (a_buf, dt_buf) = generate_steps(paths,distperstep)
+  (a_buf, dt_buf) = generate_steps(paths, distperstep)
   a &= a_buf
   dt &= dt_buf
 
   echo("--- connecting end point to path ---")
-  (dtbuf, abuf) = gen_part(connect_point_to_point(paths[^1].endpoint,vec2(0.0, 0.0)), distperstep, 500, draw = false)
+  (dtbuf, abuf) = gen_part(connect_point_to_point(paths[^1].endpoint, vec2(0.0,
+      0.0)), distperstep, 500, draw = false)
   a = a & abuf
-  dt = dt & dtbuf 
+  dt = dt & dtbuf
 
 
   # if (len(paths)-1) < count:
@@ -275,7 +285,7 @@ if isMainModule:
   #   a &= a_buf
   #   dt &= dt_buf
   #   a = a & abuf
-  #   dt = dt & dtbuf 
+  #   dt = dt & dtbuf
   #   max_ind += count
   #   min_ind += count
   #   if max_ind > len(paths)-1:
@@ -283,7 +293,7 @@ if isMainModule:
   #   if (max_ind < len(paths)-6) and (min_ind > count):
   #     (dtbuf, abuf) = gen_part(connect_path_to_path(paths[min_ind-1], paths[min_ind]), distperstep, 300, draw = false)
   #     a = a & abuf
-  #     dt = dt & dtbuf 
+  #     dt = dt & dtbuf
 
 
   write_steps_to_file("Zeichnung", dt, a)

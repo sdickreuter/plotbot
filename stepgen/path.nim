@@ -12,10 +12,10 @@ import math
 
 type Path* = ref object
     ## Holds several curves which are drawn sequentially.
-    c*: seq[Curve] ## seq which holds the Curves
+    c*: seq[Curve]   ## seq which holds the Curves
     arclength: float ## arc length of all curves combined
-    xlength: float ## distance in x direction, sum of a all curves 
-    ylength: float ## distance in y direction, sum of a all curves 
+    xlength: float   ## distance in x direction, sum of a all curves
+    ylength: float   ## distance in y direction, sum of a all curves
 
 
 proc newPath*(): Path =
@@ -61,7 +61,8 @@ proc remove_short_curves*(p: var Path, min_length: float = 0.01) =
 
     for i in countdown(len(indices)-1, 0):
         if (indices[i] > 0) and (indices[i] < (len(p.c)-1)):
-            buf = vec2( (p.c[indices[i]-1].b3[0]+p.c[indices[i]+1].b0[0])/2, (p.c[indices[i]-1].b0[1]+p.c[indices[i]+1].b3[1])/2)
+            buf = vec2( (p.c[indices[i]-1].b3[0]+p.c[indices[i]+1].b0[0])/2, (
+                    p.c[indices[i]-1].b0[1]+p.c[indices[i]+1].b3[1])/2)
             p.c[indices[i]-1].b3 = buf
             p.c[indices[i]+1].b0 = buf
 
