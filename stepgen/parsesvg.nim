@@ -129,7 +129,7 @@ if isMainModule:
     l = 0.0
 
   #paths = parsesvg("./test15.svg")
-  paths = parsesvg("./schraffiert2.svg")
+  paths = parsesvg("./test.svg")
 
 
   # shift paths to drawable area
@@ -143,12 +143,15 @@ if isMainModule:
   #for i in 0..<len(paths):
   #  echo(paths[i])
 
+
   buildSvgFile("svgtest.svg"):
-    svg(width = 200, height = 200):
+    svg(width = 90, height = 65):
       for p in paths:
         for c in p.c:
           if c.kind == ckBezier:
-            line(x1 = c.b0[0], y1 = c.b0[1], x2 = c.b3[0], y2 = c.b3[1])
+            line(x1 = c.b0[0], y1 = c.b0[1], x2 = c.b3[0], y2 = c.b3[1],
+                stroke = "#111122", fill = "#E0E0F0", `fill-opacity` = 0.5,
+                    `stroke-width` = 0.1)
 
 
 

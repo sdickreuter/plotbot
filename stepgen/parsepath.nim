@@ -36,7 +36,7 @@ proc closepath(buf: var PathBuf) =
 proc parse_positions(capture: Captures): seq[float] =
   for i in 1..<len(capture.caplist):
     result.add(parseFloat(capture.caplist[i].s))
-
+    #echo("     ", i, " ", capture.caplist[i].s)
 
 let parser = peg("path", buf: PathBuf):
 
@@ -79,7 +79,7 @@ let parser = peg("path", buf: PathBuf):
     while i < len(positions):
       c = newLine()
       c.a = buf.pen
-      c.b = vec2(positions[i], 0.0)
+      c.b = vec2(positions[i], c.a[1])
       buf.curves.add(c)
       i += 1
 
@@ -113,7 +113,7 @@ let parser = peg("path", buf: PathBuf):
     while i < len(positions):
       c = newLine()
       c.a = buf.pen
-      c.b = vec2(0.0, positions[i])
+      c.b = vec2(c.a[0], positions[i])
       buf.curves.add(c)
       i += 1
       buf.pen = buf.curves[^1].endpoint()
@@ -258,7 +258,8 @@ if isMainModule:
   #let data = "m 601.83793,578.89747 c -49.03642,-125.49365 13.01104,-241.89522 44.90129,-306.07704 31.89025,-64.18182 96.12174,-37.26159 84.56408,-86.0608"
   #let data = "M 352.47505,578.15794 397.37634,272.0809 c 145.58633,30.71944 96.12174,-37.26159 84.56408,-86.0608"
   #let data = "m 90.351296,89.165883 -10.0,-10.0 -10.0,-10.0 z"
-  let data = "m 30,65 c 6.618739,-1.043991 7.442143,-3.193627 15,0 7.557857,3.193627 7.766282,2.291048 15,0 7.233718,-2.291048 10.904607,-1.797718 15,0"
+  #let data = "m 30,65 c 6.618739,-1.043991 7.442143,-3.193627 15,0 7.557857,3.193627 7.766282,2.291048 15,0 7.233718,-2.291048 10.904607,-1.797718 15,0"
+  let data = "m 226.02217,313.81475 h 12.65437 l 6.32718,10.95901 -6.32718,10.95901 h -12.65437 l -6.32719,-10.95901 z"
 
   echo data
 

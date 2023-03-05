@@ -175,7 +175,7 @@ if isMainModule:
     paths: seq[Path]
 
 
-  #paths = parsesvg("./test2.svg")
+  #paths = parsesvg("./test.svg")
   #paths = parsesvg("./test11.svg")
   paths = parsesvg("./schraffiert2.svg")
 

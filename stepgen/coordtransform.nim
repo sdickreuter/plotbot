@@ -11,8 +11,8 @@ let
   fa = 80.0          # y position of rail a [cm]
   fb = -3.0          # y position of rail b [cm]
   zero = vec2(70.14271166700073, 41.5) # x/y pos when position on rail a/b is 0.0/0.0
-  para_offset = 0.0  #4.5  # [cm] offset along/parallel arm a
-  ortho_offset = 0.0 #3.0 # [cm] offset away from/orthogonal arm a
+  para_offset = 4.5  # [cm] offset along/parallel arm a
+  ortho_offset = 3.0 # [cm] offset away from/orthogonal arm a
 
 
 #let
@@ -182,41 +182,27 @@ proc xy_to_ab*(c: Vec2[float]): Vec2[float] =
     echo("WARNING: Points outside of reachable drawing area!")
 
   var
-    l1, alpha: float
-    v1: Vec2[float]
-
-  l1 = sqrt((al_b - para_offset)^2 + ortho_offset^2)
-
-  # vector pointing to point on rail b
-  b = vec2(0.0, fb)
-  b[0] = sqrt(l1^2 - (c[1]-b[1])^2)
-  b[0] = c[0] + b[0]
-
-  # vector pointing from rail b to c
-  v1 = c - b
-  v1 = normalize(v1)
+    al_b2, alpha: float
+    v1, v2: Vec2[float]
 
 
-  # rotate v1 clockwise aroung angle alpha
-  alpha = arcsin(ortho_offset/l1)
-  v1[0] = cos(alpha)*v1[0] + sin(alpha)*v1[1]
-  v1[1] = -sin(alpha)*v1[0] + cos(alpha)*v1[1]
+  al_b2 = sqrt((al_b - para_offset)^2 - ortho_offset^2)
+  b[0] = sqrt(al_b2^2 - (c[1]-fb)^2) + c[0]
+  b[1] = fb
+
+  v1 = b - c
+
+  alpha = arcsin(ortho_offset/(al_b - para_offset))
 
 
-  # adjust length
-  v1 = v1 * al_b
+  v2 = vec2(v1[0]*cos(alpha) - v1[1]*sin(alpha),
+             v1[0]*sin(alpha) + v1[1]*cos(alpha))
 
-  # calculate position of joint
-  v1 = v1 + b
+  v2 = normalize(v2)
+  v2 = v2 * al_b
 
-  # calculate position on rail a
-  a = vec2(0.0, fa)
-  a[0] = sqrt(al_a^2 - (a[1]-v1[1])^2)
-  a[0] = v1[0] + a[0]
-
-  a[0] = 180 - a[0]
-  b[0] = 180 - b[0]
-
+  a[0] = sqrt((fa-v2[1])^2 - al_a^2) + v2[0]
+  a[1] = fa
 
   result = vec2(a[0], b[0])
 
@@ -295,7 +281,7 @@ if isMainModule:
   a2 = xy_to_ab(v3)
   b2 = xy_to_ab(v4)
 
-  #echo("a1 ", a1, "  b1 ", b1, "  a2 ", a2, "  b2 ", b2)
+  echo("a1 ", a1, "  b1 ", b1, "  a2 ", a2, "  b2 ", b2)
   # echo("a1 ", a1/0.00304,"  b1 ", b1/0.00304,"  a2 ", a2/0.00304,"  b2 ", b2/0.00304)
 
   v1 = ab_to_xy(a1)

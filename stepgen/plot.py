@@ -137,35 +137,45 @@ for i in range(len(ac)):
     else:
       ay = -distperstep
   
-  if ax is not None or ay is not None:
-    if ax is not None:
-      x.append(x[-1] + ax)
-    else:
-      x.append(x[-1])
-    if ay is not None:
-      y.append(y[-1] + ay)
-    else:
-      y.append(y[-1])
+  if ax is not None:
+    x.append(x[-1] + ax)
+  else:
+    x.append(x[-1])
+  if ay is not None:
+    y.append(y[-1] + ay)
+  else:
+    y.append(y[-1])
 
 
   if (ac[i] & PENUP) > 0:
-    upind = i
-    xs.append(x[downind:])
-    ys.append(y[downind:])
+   upind = i
+   xs.append(x[downind:])
+   ys.append(y[downind:])
   elif (ac[i] & PENDOWN) > 0:
-    downind = i
+   downind = i
+
+  # if (ac[i] & PENUP) > 0:
+  #   draw = False
+  # elif (ac[i] & PENDOWN) > 0:
+  #   draw = True
+
+  # if ax is not None or ay is not None:
+  #   if draw:
+  #     xs.append(x[-1])
+  #     ys.append(y[-1])
 
 
 print(len(xs))
 for i in range(len(xs)):
-  #print(min(xs[i]),max(xs[i]),min(ys[i]),max(ys[i]))
-  print(len(xs[i]), len(ys[i]))
+ #print(min(xs[i]),max(xs[i]),min(ys[i]),max(ys[i]))
+ print(len(xs[i]), len(ys[i]))
 
 for i in range(len(xs)):
-  plt.plot(xs[i],ys[i])
+ plt.plot(xs[i],ys[i])
 plt.show()
 
-
+# plt.plot(xs,ys)
+# plt.show()
 
 # for i in range(len(ac)):
 #   ax = 0.0

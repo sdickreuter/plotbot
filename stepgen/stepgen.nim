@@ -151,6 +151,14 @@ proc calc_grid_intersections(c: Curve, delta: float, vind: int): seq[Intersectio
 
   result = @[]
 
+  start = c.startpoint()[vind]
+  start = round(start/delta)*delta
+  stop = c.endpoint()[vind]
+  stop = round(stop/delta)*delta
+
+  c.b0[vind] = start
+  c.b3[vind] = stop
+
   if c.kind == ckBezier:
 
     # calculate coefficients that don't change
@@ -172,7 +180,7 @@ proc calc_grid_intersections(c: Curve, delta: float, vind: int): seq[Intersectio
       res = calc_root(A, B, C, D)
       for t in res:
         # check for valid solutions
-        if t >= 0.0 and t <= 1.0:
+        if t >= (0.0-precision) and t <= (1.0+precision):
           result.add(newIntersection(val, t, vind))
 
       val += delta
@@ -185,21 +193,17 @@ proc calc_grid_intersections(c: Curve, delta: float, vind: int): seq[Intersectio
   # sort solution so that t is ascending (calc_root can give multiple solution for one val)
   result.sort(cmp)
 
-  start = c.startpoint()[vind]
-  start = round(start/delta)*delta
-  stop = c.endpoint()[vind]
-  stop = round(stop/delta)*delta
-
   # add start or end point if not yet in result
   #if len(result) > 1:
-  if len(result) > 0:
+  # if len(result) > 0:
 
-  #   #while (abs(stop - result[^1].value) >= delta) or (abs(result[0].value - start) >= delta):
-    if abs(stop - result[^1].value) >= delta*(1-precision):
-      result.add(newIntersection(stop, 1.0, vind))
+  #   while (abs(stop - result[^1].value) >= delta) or (abs(result[0].value -
+  #       start) >= delta):
+  #     if abs(stop - result[^1].value) >= delta*(1-precision):
+  #       result.add(newIntersection(stop, 1.0, vind))
 
-    if abs(result[0].value - start) >= delta*(1-precision):
-      result = newIntersection(start, 0.0, vind) & result
+  #     if abs(result[0].value - start) >= delta*(1-precision):
+  #       result = newIntersection(start, 0.0, vind) & result
 
 
 proc calc_actions*(p: Path, delta: float): (seq[int], seq[float]) =
