@@ -54,6 +54,7 @@ let
   END* = 0b01000000'i8
 
 
+
 proc calc_actions_from_intersections(xinter, yinter: var seq[Intersection]): (
     seq[int], seq[float]) =
   var

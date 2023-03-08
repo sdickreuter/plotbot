@@ -2,7 +2,7 @@
     Stepper.h
 	Contains class for controlling a A4983 stepper driver
 
-    @author Simon Dickreuter
+    @author sei
 */
 
 #ifndef Stepper_h

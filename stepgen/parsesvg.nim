@@ -113,9 +113,9 @@ proc parsesvg*(filename: string): seq[Path] =
     result[i].scale(vec2(width/viewbox[2], height/viewbox[3]))
 
   # # flip up/down
-  for i in 0..<len(result):
-    result[i].scale(vec2(1.0, -1.0))
-    result[i].shift(vec2(0.0, height))
+  #for i in 0..<len(result):
+  #  result[i].scale(vec2(1.0, -1.0))
+  #  result[i].shift(vec2(0.0, height))
 
 
 

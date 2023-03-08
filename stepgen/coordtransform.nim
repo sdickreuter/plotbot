@@ -6,14 +6,16 @@ import curve
 
 let
   #al = 81.5#arm length [cm]
-  al_a = 81.5        #8.5 # a arm length [cm]
-  al_b = 81.57       #85.5 #  arm length [cm]
-  fa = 80.0          # y position of rail a [cm]
-  fb = -3.0          # y position of rail b [cm]
-  zero = vec2(70.14271166700073, 41.5) # x/y pos when position on rail a/b is 0.0/0.0
-  para_offset = 4.5  # [cm] offset along/parallel arm a
-  ortho_offset = 3.0 # [cm] offset away from/orthogonal arm a
-
+  al_a = 81.5               #8.5 # a arm length [cm]
+  al_b = 81.57              #85.5 #  arm length [cm]
+  fa = 80.0                 # y position of rail a [cm]
+  fb = -3.0                 # y position of rail b [cm]
+              #zero = vec2(70.14271166700073, 41.5) # x/y pos when position on rail a/b is 0.0/0.0
+  zero = vec2(90+8.5, 27.0) # x/y pos when position on rail a/b is 0.0/0.0
+  para_offset = 4.5         # [cm] offset along/parallel arm a
+  ortho_offset = 3.0        # [cm] offset away from/orthogonal arm a
+  rail_length = 165.0
+  l = sqrt(ortho_offset.pow(2) + (al_b - para_offset).pow(2))
 
 #let
 #  #al = 81.5#arm length [mm]
@@ -76,10 +78,10 @@ proc ab_to_xy*(p: Vec2[float]): Vec2[float] =
   l = (al_a^2 - al_b^2 + d^2) / (2.0*d)
   h = sqrt(al_a^2 - l^2)
 
-  x1 = (l/d)*dx + (h/d)*dy + a[0]
+  x1 = (l/d)*dx + (h/d)*dy - a[0]
   y1 = (l/d)*dy - (h/d)*dx + a[1]
 
-  x2 = (l/d)*dx - (h/d)*dy + a[0]
+  x2 = (l/d)*dx - (h/d)*dy - a[0]
   y2 = (l/d)*dy + (h/d)*dx + a[1]
 
   #echo("x1 ", x1, " x2 ", x2, " |  y1 ",y1, " y2 ",y2)
@@ -176,35 +178,34 @@ proc intersect_line_circle*(a, b, c: Vec2[float], r: float): Vec2[float] =
 
 proc xy_to_ab*(c: Vec2[float]): Vec2[float] =
   var
-    a, b: Vec2[float]
+    a, b: float
 
   if (c[1] > fa) or (c[1]) < 0:
     echo("WARNING: Points outside of reachable drawing area!")
 
   var
-    al_b2, alpha: float
-    v1, v2: Vec2[float]
+    alpha, beta, x2, y2: float
 
+  #echo("--------")
+  #echo("c ", c)
 
-  al_b2 = sqrt((al_b - para_offset)^2 - ortho_offset^2)
-  b[0] = sqrt(al_b2^2 - (c[1]-fb)^2) + c[0]
-  b[1] = fb
+  b = c[0] + sqrt(-c[1].pow(2) + l.pow(2))
+  #echo("b ", b, "   ", c[1].pow(2), " ", l.pow(2))
 
-  v1 = b - c
+  alpha = arcsin(c[1]/l)
+  #echo("alpha ", c[1]/l)
 
-  alpha = arcsin(ortho_offset/(al_b - para_offset))
+  beta = arcsin(ortho_offset/l)
+  #echo("beta ", beta)
 
+  x2 = b - al_b*cos(alpha+beta)
+  y2 = al_b*sin(alpha+beta)
 
-  v2 = vec2(v1[0]*cos(alpha) - v1[1]*sin(alpha),
-             v1[0]*sin(alpha) + v1[1]*cos(alpha))
+  a = x2 + sqrt(al_a.pow(2) - ((fa-fb)-y2).pow(2))
+  #echo("a ", a, "   ", al_a.pow(2), " ", ((fa-fb)-y2).pow(2))
+  #echo("--------")
 
-  v2 = normalize(v2)
-  v2 = v2 * al_b
-
-  a[0] = sqrt((fa-v2[1])^2 - al_a^2) + v2[0]
-  a[1] = fa
-
-  result = vec2(a[0], b[0])
+  result = vec2(rail_length - a, rail_length - b)
 
 
 
@@ -249,7 +250,7 @@ proc ab_to_xy*(p: var Path) =
 
 if isMainModule:
   var
-    a1, b1, a2, b2, v1, v2, v3, v4: Vec2[float]
+    a1, a2, a3, a4, v1, v2, v3, v4: Vec2[float]
 
 
   #v1 = vec2(1.0,1.0)
@@ -267,27 +268,45 @@ if isMainModule:
   #v1 = vec2(1.0,76.0)
   #echo(v1, xy_to_ab(v1))
 
-  # echo("zero ",ab_to_xy(vec2(0.0,0.0)))
+  let
+    distperstep: float = 0.00375         # cm
+    offset: Vec2[float] = vec2(0.0, 0.0) #ab_to_xy(vec2(0.0, 0.0))-zero
 
-  v1 = vec2(70.0, 10.0)
-  v2 = vec2(10.0, 65.0)
-  v3 = vec2(10.0, 10.0)
-  v4 = vec2(70.0, 65.0)
 
-  echo("v1 ", v1, "  v2 ", v2, "  v3 ", v3, "  v4 ", v4)
+  echo("zero ", zero, ab_to_xy(vec2(0.0, 0.0)))
+  echo("10|10 ", ab_to_xy(vec2(10.0, 10.0)))
+  echo()
+  echo("zero->ab ", xy_to_ab(zero+offset)/distperstep)
+  echo("ab->zero ", ab_to_xy(xy_to_ab(zero+offset)/distperstep)-offset)
+  echo()
 
-  a1 = xy_to_ab(v1)
-  b1 = xy_to_ab(v2)
-  a2 = xy_to_ab(v3)
-  b2 = xy_to_ab(v4)
+  v1 = vec2(0.0+1.0, 0.0+1.0)
+  v2 = vec2(90.0-1.0, 0.0+1.0)
+  v3 = vec2(0.0+1.0, 65.0-1.0)
+  v4 = vec2(90.0-1.0, 65.0-1.0)
 
-  echo("a1 ", a1, "  b1 ", b1, "  a2 ", a2, "  b2 ", b2)
+  echo("v1 ", v1, " ", 35500, " | ", 26500,
+    "\nv2 ", v2, " ", 10000, " | ", 500,
+    "\nv3 ", v3, " ", 24000, " | ", 44000,
+    "\nv4 ", v4, " ", 0, " | ", 20000, )
+  echo()
+
+  a1 = xy_to_ab(v1+offset)
+  a2 = xy_to_ab(v2+offset)
+  a3 = xy_to_ab(v3+offset)
+  a4 = xy_to_ab(v4+offset)
+
+  echo("a1 ", a1/distperstep,
+    "\na2 ", a2/distperstep,
+    "\na3 ", a3/distperstep,
+    "\na4 ", a4/distperstep)
   # echo("a1 ", a1/0.00304,"  b1 ", b1/0.00304,"  a2 ", a2/0.00304,"  b2 ", b2/0.00304)
+  echo()
 
-  v1 = ab_to_xy(a1)
-  v2 = ab_to_xy(b1)
-  v3 = ab_to_xy(a2)
-  v4 = ab_to_xy(b2)
+  v1 = ab_to_xy(a1)-offset
+  v2 = ab_to_xy(a2)-offset
+  v3 = ab_to_xy(a3)-offset
+  v4 = ab_to_xy(a4)-offset
 
-  echo("v1 ", v1, "  v2 ", v2, "  v3 ", v3, "  v4 ", v4)
+  echo("v1 ", v1, "\nv2 ", v2, "\nv3 ", v3, "\nv4 ", v4)
 

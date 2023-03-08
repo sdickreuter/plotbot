@@ -293,25 +293,38 @@ class Form(QtWidgets.QDialog):
         
         self.bot.start_moving()
 
+        print("Movement started")
+
         size = 300
 
         finished = False
 
+        t0 = time.time()
         ind = 0
+        prevind = 0
         while not finished:
-            
             l = self.bot.read_bufferlength()
+            #print("   bufferlength "+str(l))
+                
+
+            #if ind != prevind:
+            #    #self.textbox.appendPlainText(str(ind)+'/'+str(len(t))+" bufferlength"+str(l))
+            #    print(ind,'  ',str(ind)+'/'+str(len(t))+" bufferlength "+str(l))
+            #    prevind = ind
+
 
             if l is not None:
                 if l < (5000-size):
                     send = t[ind:ind+size,:]
                     if len(send) > 0:
+                        #print('     ', send[0,:])
                         self.bot.write_buffer(send[:,0], np.array(send[:,1],dtype=int))
                         ind += size
                     else:
                         finished = True  
                 # if l < 4000:
                 #     print("buffer: ",l)
+            #time.sleep(0.1)
 
         while l > 0:
             l = self.bot.read_bufferlength()

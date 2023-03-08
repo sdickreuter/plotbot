@@ -2,7 +2,7 @@
     Stepper.cpp
 	Contains class for controlling a TMC2209 SilentStepStick
 
-    @author Simon Dickreuter
+    @author sei
 */
 
 #include "Stepper.h"
@@ -29,7 +29,7 @@ Stepper::Stepper(int ENABLE,int MS1,int MS2,int SPREAD,int STEP,int DIR, bool fl
 	setMicrostepping(0);
 
 	position = 0;
-	dir = 1;
+	dir = -1;
 }
 
 void Stepper::enableDriver(){
@@ -75,10 +75,10 @@ long Stepper::get_pos() {
 
 void Stepper::set_dir(bool dir) {
   if ((dir>0) xor this->flipped) {
-    this->dir = 1;
+    this->dir = -1;
     digitalWriteFast(this->DIR_pin, LOW);
   } else {
-  	this->dir = -1;
+  	this->dir = +1;
     digitalWriteFast(this->DIR_pin, HIGH);
   }
 }

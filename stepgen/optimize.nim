@@ -175,7 +175,7 @@ if isMainModule:
     paths: seq[Path]
 
 
-  #paths = parsesvg("./test.svg")
+  #paths = parsesvg("./test2.svg")
   #paths = parsesvg("./test11.svg")
   paths = parsesvg("./schraffiert2.svg")
 
@@ -187,7 +187,7 @@ if isMainModule:
 
   # shift paths to drawable area
   for i in 0..(len(paths)-1):
-    paths[i].shift(vec2(+8.0, 3.0))
+    paths[i].shift(vec2(-10.0, 10.0))
     #paths[i].shift(vec2(+0.0, -20.0))
 
 
@@ -228,9 +228,8 @@ if isMainModule:
 
   echo("do coordinate transformation")
   # apply coordiante transformation
-  #for i in 0..<len(paths):
-  #  paths[i].xy_to_ab()
-
+  for i in 0..<len(paths):
+    paths[i].xy_to_ab()
 
 
   #echo("paths start/end:")

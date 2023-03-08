@@ -84,7 +84,7 @@ dtb = dt[np.bitwise_and(ac,STEP_B)]
 ta = t[np.bitwise_and(ac,STEP_A)]
 tb = t[np.bitwise_and(ac,STEP_B)]
 
-distperstep = 0.00375
+distperstep = 1 #0.00375
 
 xpos = 0
 ypos = 0

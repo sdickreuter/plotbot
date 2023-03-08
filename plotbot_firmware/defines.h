@@ -24,7 +24,7 @@
 #define BUFFER_SIZE 5100
 
 // Pinout for top stepper
-#define TOP_ENABLE 13   // blau
+#define TOP_ENABLE 19//13   // blau
 #define TOP_MS1 14      // grün
 #define TOP_MS2 15      // gelb
 #define TOP_SPRD 16     // orange
@@ -50,6 +50,6 @@
 
 // struct for storing step timings
 struct dtData {
-  float dt;
+  unsigned long dt;
   char action;
 };
